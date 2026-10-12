@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteNow - High Fidelity Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF4757;
+            --primary-hover: #FF6B81;
+            --dark: #2F3542;
+            --light: #F1F2F6;
+            --white: #FFFFFF;
+            --success: #2ED573;
+            --text-muted: #747D8C;
+            --radius: 20px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(255, 71, 87, 0.15);
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--light); color: var(--dark); padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
+        
+        /* Navigation (Glassmorphism) */
+        header { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(10px);
+            padding: 15px 25px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 100; 
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .logo { font-size: 26px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+        .cart-btn { 
+            background: var(--dark); color: var(--white); border: none; 
+            padding: 12px 20px; border-radius: 30px; cursor: pointer; 
+            font-weight: 600; font-size: 15px; transition: 0.3s ease;
+            box-shadow: 0 4px 15px rgba(47, 53, 66, 0.2);
+        }
+        .cart-btn:hover { background: #000; transform: translateY(-2px); }
+        
+        /* Containers */
+        .container { max-width: 650px; margin: 0 auto; padding: 25px; }
+        .section-title { font-size: 22px; font-weight: 700; margin: 30px 0 15px 0; color: var(--dark); }
+        
+        /* BitePass Banner */
+        .bitepass-banner { 
+            background: linear-gradient(135deg, #FF4757, #FF7E5F); 
+            color: white; padding: 25px; border-radius: var(--radius); 
+            margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: var(--shadow); position: relative; overflow: hidden;
+        }
+        .bitepass-banner::after {
+            content: '✨'; position: absolute; right: -10px; top: -10px; font-size: 100px; opacity: 0.1;
+        }
+        .bitepass-banner h3 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        .bitepass-btn { 
+            background: white; color: var(--primary); border: none; 
+            padding: 12px 24px; border-radius: 30px; cursor: pointer; 
+            font-weight: 700; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1; position: relative;
+        }
+        .bitepass-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        /* AI Assistant Section */
+        .ai-section { 
+            background: var(--white); padding: 25px; border-radius: var(--radius); 
+            margin-bottom: 25px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.02);
+        }
+        .ai-section h3 { margin-bottom: 8px; color: var(--success); display: flex; align-items: center; gap: 8px; font-size: 18px; }
+        .ai-input-group { display: flex; gap: 12px; margin-top: 15px; }
+        .ai-input-group input { 
+            flex: 1; padding: 14px 18px; border: 1.5px solid #E1E5EE; 
+            border-radius: 12px; font-size: 15px; outline: none; transition: 0.3s;
+        }
+        .ai-input-group input:focus { border-color: var(--success); box-shadow: 0 0 0 4px rgba(46, 213, 115, 0.1); }
+        .ai-input-group button { 
+            background: var(--success); color: white; border: none; 
+            padding: 0 24px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.3s;
+        }
+        .ai-input-group button:hover { background: #26B562; }
+        #ai-response { 
+            margin-top: 20px; color: #2D3436; font-size: 15px; line-height: 1.5;
+            background: #F0FDFA; padding: 15px 20px; border-radius: 12px; 
+            display: none; border-left: 4px solid var(--success);
+        }
+        
+        /* Restaurant & Food Cards */
+        .restaurant-card { 
+            background: var(--white); border-radius: var(--radius); overflow: hidden; 
+            margin-bottom: 25px; box-shadow: var(--shadow); transition: 0.3s ease;
+        }
+        .restaurant-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+        .res-info { padding: 25px; }
+        .exclusive-badge { 
+            background: var(--dark); color: white; font-size: 11px; font-weight: 700;
+            padding: 5px 12px; border-radius: 20px; text-transform: uppercase; 
+            margin-bottom: 12px; display: inline-block; letter-spacing: 0.5px;
+        }
+        
+        /* Food Item Rows */
+        .menu-item { 
+            display: flex; align-items: center; padding: 15px 0; 
+            border-top: 1px solid #F1F2F6; gap: 15px;
+        }
+        .menu-item:first-of-type { margin-top: 15px; }
+        .food-img { 
+            width: 70px; height: 70px; border-radius: 12px; 
+            object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .food-details { flex: 1; }
+        .food-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; display: block; }
+        .food-price { color: var(--text-muted); font-size: 14px; font-weight: 600; }
+        .add-btn { 
+            background: var(--primary); color: white; border: none; 
+            padding: 8px 18px; border-radius: 20px; cursor: pointer; 
+            font-weight: 600; transition: 0.2s; font-size: 14px;
+        }
+        .add-btn:hover { background: var(--primary-hover); transform: scale(1.05); }
+
+        /* Cart Overlay Bottom Sheet */
+        .cart-modal { 
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; 
+            background: white; padding: 30px; border-radius: 30px 30px 0 0; 
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15); z-index: 200; 
+            max-height: 85vh; overflow-y: auto; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .cart-header h3 { font-size: 22px; font-weight: 700; }
+        .close-btn { background: #F1F2F6; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; color: var(--dark); transition: 0.2s; }
+        .close-btn:hover { background: #E1E5EE; }
+        .cart-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 16px; color: var(--dark); }
+        .total-row { font-weight: 700; font-size: 20px; border-top: 2px dashed #E1E5EE; padding-top: 15px; margin-top: 15px; color: var(--primary); }
+        .checkout-btn { 
+            width: 100%; background: var(--primary); color: white; border: none; 
+            padding: 18px; border-radius: 16px; margin-top: 25px; 
+            font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.2);
+        }
+        .checkout-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">BiteNow.</div>
+        <button class="cart-btn" onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</button>
+    </header>
+
+    <div class="container">
+        <!-- Feature 1: Customer Retention Program (BitePass) -->
+        <section class="bitepass-banner">
+            <div>
+                <h3>BitePass</h3>
+                <p style="font-size: 15px; opacity: 0.9; font-weight: 300;">₹0 Delivery Fees on all orders!</p>
+            </div>
+            <button class="bitepass-btn" id="bitepassBtn" onclick="toggleBitePass()">Subscribe ₹299/mo</button>
+        </section>
+
+        <!-- Feature 2: Product Differentiation (AI Dietary Assistant) -->
+        <section class="ai-section">
+            <h3>✨ AI Dietary Assistant</h3>
+            <p style="font-size: 14px; color: var(--text-muted);">Tell me your cravings, diet, or macros.</p>
+            <div class="ai-input-group">
+                <input type="text" id="aiInput" placeholder="e.g., High protein post-workout meal">
+                <button onclick="askAI()">Ask AI</button>
+            </div>
+            <div id="ai-response"></div>
+        </section>
+
+        <h2 class="section-title">Exclusive Partners</h2>
+        
+        <!-- Restaurant 1 -->
+        <div class="restaurant-card">
+            <div class="res-info">
+                <span class="exclusive-badge">Only on BiteNow</span>
+                <h3 style="font-size: 20px; margin-bottom: 5px;">The Burger Club</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">American • Fast Food • 4.8★</p>
+                
+                <!-- Food Item 1 -->
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=200&q=80" alt="Burger" class="food-img">
+                    <div class="food-details">
+                        <span class="food-name">Double Smash Burger</span>
+                        <span class="food-price">₹349</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart('Double Smash Burger', 349)">+ Add</button>
+                </div>
+                
+                <!-- Food Item 2 (UPDATED FRIES IMAGE) -->
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1585109649139-366815a0d713?auto=format&fit=crop&w=200&q=80" alt="Fries" class="food-img">
+                    <div class="food-details">
+                        <span class="food-name">Truffle Parmesan Fries</span>
+                        <span class="food-price">₹199</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart('Truffle Parmesan Fries', 199)">+ Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Restaurant 2 -->
+        <div class="restaurant-card">
+            <div class="res-info">
+                <h3 style="font-size: 20px; margin-bottom: 5px;">Green Bowl Co.</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">Healthy • Salads • 4.9★</p>
+                
+                <!-- Food Item 3 -->
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=200&q=80" alt="Salad" class="food-img">
+                    <div class="food-details">
+                        <span class="food-name">Keto Power Salad</span>
+                        <span class="food-price">₹299</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart('Keto Power Salad', 299)">+ Add</button>
+                </div>
+                
+                <!-- Food Item 4 -->
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?auto=format&fit=crop&w=200&q=80" alt="Avocado Toast" class="food-img">
+                    <div class="food-details">
+                        <span class="food-name">Avocado Toast</span>
+                        <span class="food-price">₹249</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart('Avocado Toast', 249)">+ Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Restaurant 3 -->
+        <div class="restaurant-card">
+            <div class="res-info">
+                <h3 style="font-size: 20px; margin-bottom: 5px;">Spice Route</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 10px;">North Indian • Curries • 4.7★</p>
+                
+                <!-- Food Item 5 -->
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=200&q=80" alt="Butter Chicken" class="food-img">
+                    <div class="food-details">
+                        <span class="food-name">Butter Chicken Bowl</span>
+                        <span class="food-price">₹399</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart('Butter Chicken Bowl', 399)">+ Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h3>Your Order</h3>
+            <button class="close-btn" onclick="toggleCart()">✕</button>
+        </div>
+        <div id="cart-items">
+            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px; text-align: center;">Your cart is empty.</p>
+        </div>
+        
+        <div style="border-top: 1px solid #F1F2F6; padding-top: 20px;">
+            <div class="cart-row">
+                <span style="color: var(--text-muted)">Subtotal:</span>
+                <span id="subtotal" style="font-weight: 600;">₹0</span>
+            </div>
+            <div class="cart-row">
+                <span style="color: var(--text-muted)">Delivery Fee:</span>
+                <span id="delivery-fee" style="font-weight: 600;">₹49</span>
+            </div>
+            <div class="cart-row total-row">
+                <span>Total:</span>
+                <span id="total">₹0</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let hasBitePass = false;
+        const BASE_DELIVERY_FEE = 49;
+
+        // 1. BitePass Logic
+        function toggleBitePass() {
+            hasBitePass = !hasBitePass;
+            const btn = document.getElementById('bitepassBtn');
+            if(hasBitePass) {
+                btn.innerText = "✓ Active";
+                btn.style.background = "var(--success)";
+                btn.style.color = "white";
+                btn.style.boxShadow = "0 10px 20px rgba(46, 213, 115, 0.3)";
+                alert("BitePass Activated! You now have ₹0 delivery fees.");
+            } else {
+                btn.innerText = "Subscribe ₹299/mo";
+                btn.style.background = "white";
+                btn.style.color = "var(--primary)";
+                btn.style.boxShadow = "none";
+            }
+            updateCartUI();
+        }
+
+        // 2. AI Assistant Logic
+        function askAI() {
+            const input = document.getElementById('aiInput').value.toLowerCase();
+            const responseDiv = document.getElementById('ai-response');
+            
+            if(!input) {
+                responseDiv.innerHTML = "Please enter a craving first!";
+                responseDiv.style.display = "block";
+                return;
+            }
+
+            responseDiv.innerHTML = "<em>Analyzing your nutritional goals...</em>";
+            responseDiv.style.display = "block";
+
+            setTimeout(() => {
+                let recommendation = "";
+                if(input.includes("protein") || input.includes("workout") || input.includes("healthy")) {
+                    recommendation = "AI Suggestion: You should try the <strong>Keto Power Salad</strong> from Green Bowl Co. It has 45g of protein and fits your macros perfectly!";
+                } else if(input.includes("burger") || input.includes("cheat")) {
+                    recommendation = "AI Suggestion: Treating yourself? The <strong>Double Smash Burger</strong> is highly rated for cheat days.";
+                } else if(input.includes("indian") || input.includes("curry") || input.includes("spicy")) {
+                    recommendation = "AI Suggestion: Craving comfort? The <strong>Butter Chicken Bowl</strong> from Spice Route is a local favorite.";
+                } else {
+                    recommendation = "AI Suggestion: Based on your input, our exclusive partner The Burger Club has options you might love.";
+                }
+                responseDiv.innerHTML = recommendation;
+            }, 800);
+        }
+
+        // 3. Cart Logic
+        function addToCart(itemName, price) {
+            cart.push({ name: itemName, price: price });
+            document.getElementById('cart-count').innerText = cart.length;
+            updateCartUI();
+            
+            // Button animation feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "✓ Added";
+            btn.style.background = "var(--success)";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "var(--primary)";
+            }, 1000);
+        }
+
+        function updateCartUI() {
+            const itemsContainer = document.getElementById('cart-items');
+            
+            if(cart.length === 0) {
+                itemsContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px; text-align: center;">Your cart is empty.</p>';
+                document.getElementById('subtotal').innerText = "₹0";
+                document.getElementById('delivery-fee').innerText = "₹0";
+                document.getElementById('total').innerText = "₹0";
+                return;
+            }
+
+            itemsContainer.innerHTML = '';
+            let subtotal = 0;
+            cart.forEach(item => {
+                subtotal += item.price;
+                itemsContainer.innerHTML += `
+                    <div class="cart-row">
+                        <span style="font-weight: 500;">${item.name}</span>
+                        <span style="font-weight: 600;">₹${item.price}</span>
+                    </div>
+                `;
+            });
+
+            const deliveryFee = hasBitePass ? 0 : BASE_DELIVERY_FEE;
+            const total = subtotal + deliveryFee;
+
+            document.getElementById('subtotal').innerText = `₹${subtotal}`;
+            
+            const feeElement = document.getElementById('delivery-fee');
+            if(hasBitePass) {
+                feeElement.innerHTML = `<span style="text-decoration: line-through; color: #A4B0BE; margin-right: 8px;">₹49</span> <span style="color: var(--success);">₹0</span>`;
+            } else {
+                feeElement.innerText = `₹${deliveryFee}`;
+            }
+            
+            document.getElementById('total').innerText = `₹${total}`;
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function checkout() {
+            if(cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            alert("Order Placed Successfully! Your food will arrive soon.");
+            cart = []; 
+            document.getElementById('cart-count').innerText = "0";
+            updateCartUI();
+            toggleCart();
+        }
+    </script>
+</body>
+</html>
