@@ -163,9 +163,9 @@
         <!-- Feature 2: Product Differentiation (AI Dietary Assistant) -->
         <section class="ai-section">
             <h3>✨ AI Dietary Assistant</h3>
-            <p style="font-size: 14px; color: var(--text-muted);">Ask anything! (e.g., "What's the cheapest?", "Do you have veg?", "I want spicy")</p>
+            <p style="font-size: 14px; color: var(--text-muted);">Ask anything! (e.g., "Calories in the salad?", "I have ₹250", "Ingredients in the burger?")</p>
             <div class="ai-input-group">
-                <input type="text" id="aiInput" placeholder="Ask about our 5 menu items...">
+                <input type="text" id="aiInput" placeholder="Ask about our menu...">
                 <button onclick="askAI()">Ask AI</button>
             </div>
             <div id="ai-response"></div>
@@ -281,7 +281,7 @@
         let hasBitePass = false;
         const BASE_DELIVERY_FEE = 49;
 
-        // 1. BitePass Logic
+        // --- 1. BitePass Logic ---
         function toggleBitePass() {
             hasBitePass = !hasBitePass;
             const btn = document.getElementById('bitepassBtn');
@@ -300,7 +300,36 @@
             updateCartUI();
         }
 
-        // 2. Comprehensive AI Assistant Logic
+        // --- 2. ADVANCED AI KNOWLEDGE BASE & ENGINE ---
+        // This acts as the "brain" of the AI, containing all facts about the 5 dishes.
+        const menuDB = [
+            {
+                name: "Double Smash Burger", price: 349, type: "non-veg", calories: "850 kcal",
+                desc: "A heavy, meaty cheat meal with double beef patties, melted cheese, and a soft bun.",
+                tags: ["burger", "beef", "meat", "cheese", "heavy", "cheat", "fast food", "american", "bun", "bread", "lunch", "dinner", "unhealthy", "craving"]
+            },
+            {
+                name: "Truffle Parmesan Fries", price: 199, type: "veg", calories: "400 kcal",
+                desc: "Crispy potato fries tossed in premium truffle oil and parmesan cheese. Great side or snack.",
+                tags: ["fries", "potato", "snack", "cheese", "side", "truffle", "crispy", "fried", "cheap", "appetizer", "starter"]
+            },
+            {
+                name: "Keto Power Salad", price: 299, type: "veg", calories: "320 kcal",
+                desc: "A healthy, low-carb, high-protein salad packed with fresh greens and keto-friendly dressing.",
+                tags: ["salad", "keto", "protein", "healthy", "low carb", "greens", "diet", "workout", "fitness", "fresh", "bowl", "light", "weight loss"]
+            },
+            {
+                name: "Avocado Toast", price: 249, type: "vegan", calories: "280 kcal",
+                desc: "Fresh avocado mashed on toasted artisan bread. Light, 100% vegan, and perfect for breakfast.",
+                tags: ["avocado", "toast", "bread", "vegan", "breakfast", "morning", "light", "healthy", "plant based", "snack", "green"]
+            },
+            {
+                name: "Butter Chicken Bowl", price: 399, type: "non-veg", calories: "750 kcal",
+                desc: "A rich, spicy, and comforting authentic Indian chicken curry served with steamed rice.",
+                tags: ["chicken", "butter", "indian", "curry", "rice", "spicy", "comfort", "gravy", "dinner", "heavy", "rich", "meat", "desi"]
+            }
+        ];
+
         function askAI() {
             const input = document.getElementById('aiInput').value.toLowerCase();
             const responseDiv = document.getElementById('ai-response');
@@ -311,73 +340,85 @@
                 return;
             }
 
-            responseDiv.innerHTML = "<em>Analyzing our menu for you...</em>";
+            responseDiv.innerHTML = "<em>Analyzing the menu database...</em>";
             responseDiv.style.display = "block";
 
             setTimeout(() => {
                 let rec = "";
                 
-                // --- CATEGORY 1: Pricing Queries ---
-                if (input.includes("cheap") || input.includes("lowest") || input.includes("under 200")) {
-                    rec = "Our cheapest item is the <strong>Truffle Parmesan Fries</strong> at just ₹199! Great for a quick snack.";
+                // 1. Check for specific superlatives (cheapest/most expensive)
+                if (input.includes("cheapest") || input.includes("lowest price") || input.includes("least expensive")) {
+                    let cheapest = menuDB.reduce((prev, curr) => prev.price < curr.price ? prev : curr);
+                    rec = `The cheapest item is the <strong>${cheapest.name}</strong> at just ₹${cheapest.price}.`;
                 } 
                 else if (input.includes("expensive") || input.includes("highest") || input.includes("most")) {
-                    rec = "Our most premium dish is the <strong>Butter Chicken Bowl</strong> at ₹399. It's rich, authentic, and completely worth it!";
-                } 
-                else if (input.includes("price") || input.includes("cost") || input.includes("how much") || input.includes("menu")) {
-                    rec = "Here are our prices: Fries (₹199), Avocado Toast (₹249), Keto Salad (₹299), Smash Burger (₹349), and Butter Chicken (₹399).";
+                    let expensive = menuDB.reduce((prev, curr) => prev.price > curr.price ? prev : curr);
+                    rec = `Our most premium dish is the <strong>${expensive.name}</strong> at ₹${expensive.price}.`;
                 }
-                else if (input.includes("burger price") || input.includes("cost of burger")) {
-                    rec = "The Double Smash Burger costs ₹349.";
+                // 2. Check for budget constraints (e.g., "under 300", "i have 250")
+                else if (input.match(/under \d+/) || input.match(/have \d+/)) {
+                    let budget = input.match(/\d+/)[0];
+                    let affordable = menuDB.filter(item => item.price <= parseInt(budget));
+                    if(affordable.length > 0) {
+                        let names = affordable.map(i => i.name).join(", ");
+                        rec = `For under ₹${budget}, you can afford: <strong>${names}</strong>.`;
+                    } else {
+                        rec = `I'm sorry, all our items cost more than ₹${budget}. Our cheapest is ₹199.`;
+                    }
                 }
-                
-                // --- CATEGORY 2: Dietary & Health Queries ---
-                else if (input.includes("veg ") || input.includes("vegetarian")) {
-                    rec = "We have great vegetarian options! You will love the <strong>Keto Power Salad (₹299)</strong>, <strong>Avocado Toast (₹249)</strong>, or our <strong>Truffle Fries (₹199)</strong>.";
-                } 
-                else if (input.includes("vegan") || input.includes("light") || input.includes("breakfast")) {
-                    rec = "I recommend the <strong>Avocado Toast</strong> (₹249). It's light, fresh, plant-based, and perfect for a healthy start.";
-                } 
-                else if (input.includes("protein") || input.includes("workout") || input.includes("keto") || input.includes("diet") || input.includes("healthy")) {
-                    rec = "The <strong>Keto Power Salad</strong> (₹299) is packed with protein and low in carbs. Perfect for hitting your daily macros!";
-                }
-                
-                // --- CATEGORY 3: Specific Item Queries & Cravings ---
-                else if (input.includes("chicken") || input.includes("indian") || input.includes("curry") || input.includes("spicy") || input.includes("comfort")) {
-                    rec = "You are looking for the <strong>Butter Chicken Bowl</strong> (₹399) from Spice Route. It's rich, spicy, and the ultimate comfort food.";
-                } 
-                else if (input.includes("burger") || input.includes("cheat") || input.includes("heavy") || input.includes("fast food") || input.includes("beef") || input.includes("meat")) {
-                    rec = "Treat yourself to the <strong>Double Smash Burger</strong> (₹349) from The Burger Club! Pair it with fries for the ultimate cheat meal.";
-                } 
-                else if (input.includes("fries") || input.includes("snack") || input.includes("potato") || input.includes("side")) {
-                    rec = "Our <strong>Truffle Parmesan Fries</strong> (₹199) are crispy, flavorful, and make the perfect side or quick snack.";
-                } 
-                else if (input.includes("non veg") || input.includes("non-veg")) {
-                    rec = "For non-veg, we highly recommend the <strong>Butter Chicken Bowl (₹399)</strong> or the <strong>Double Smash Burger (₹349)</strong>.";
-                } 
-                else if (input.includes("toast") || input.includes("avocado")) {
-                    rec = "The <strong>Avocado Toast (₹249)</strong> is served fresh from Green Bowl Co. It's a great light option!";
-                } 
-                else if (input.includes("salad")) {
-                    rec = "The <strong>Keto Power Salad (₹299)</strong> is our signature healthy bowl, keeping you fit without compromising on taste.";
-                }
-                
-                // --- CATEGORY 4: Fallback for unmapped queries ---
+                // 3. Dynamic Scoring Engine for all other questions
                 else {
-                    rec = "I can help you decide between our 5 items: Burger, Fries, Keto Salad, Avocado Toast, or Butter Chicken. Try asking 'What is cheapest?', 'Do you have veg?', or 'I want spicy food'.";
+                    let bestMatch = null;
+                    let highestScore = 0;
+
+                    // Score each dish against the user's input
+                    menuDB.forEach(item => {
+                        let score = 0;
+                        // Match tags/ingredients
+                        item.tags.forEach(tag => {
+                            if (input.includes(tag)) score += 2;
+                        });
+                        // Match exact name
+                        if (input.includes(item.name.toLowerCase())) score += 5;
+                        // Match veg/non-veg type
+                        if (input.includes(item.type) || (input.includes("veg") && item.type === "veg" && !input.includes("non"))) score += 3;
+
+                        if (score > highestScore) {
+                            highestScore = score;
+                            bestMatch = item;
+                        }
+                    });
+
+                    // 4. Generate contextual answer based on the best matched dish
+                    if (bestMatch) {
+                        if (input.includes("calorie") || input.includes("health") || input.includes("fat") || input.includes("diet")) {
+                            rec = `The <strong>${bestMatch.name}</strong> contains approximately <strong>${bestMatch.calories}</strong>. ${bestMatch.desc}`;
+                        } 
+                        else if (input.includes("price") || input.includes("cost") || input.includes("how much")) {
+                            rec = `The <strong>${bestMatch.name}</strong> costs <strong>₹${bestMatch.price}</strong>.`;
+                        } 
+                        else if (input.includes("ingredient") || input.includes("what is in") || input.includes("made of")) {
+                            rec = `The <strong>${bestMatch.name}</strong> is made of: ${bestMatch.desc}`;
+                        } 
+                        else {
+                            rec = `Based on what you asked, I recommend the <strong>${bestMatch.name} (₹${bestMatch.price})</strong>. ${bestMatch.desc}`;
+                        }
+                    } else {
+                        // Fallback if the user types something completely unrelated to the menu
+                        rec = "I couldn't find an exact match. Try asking about our <strong>Burger, Fries, Keto Salad, Avocado Toast, or Butter Chicken</strong>. You can ask for prices, calories, or ingredients!";
+                    }
                 }
                 
-                responseDiv.innerHTML = "✨ <strong>AI Suggestion:</strong> " + rec;
+                responseDiv.innerHTML = "✨ <strong>AI:</strong> " + rec;
             }, 600);
         }
 
-        // 3. Cart Logic
+        // --- 3. Cart & Checkout Logic ---
         function addToCart(itemName, price) {
             cart.push({ name: itemName, price: price });
             document.getElementById('cart-count').innerText = cart.length;
             updateCartUI();
             
-            // Button animation feedback
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "✓ Added";
