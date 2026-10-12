@@ -163,9 +163,9 @@
         <!-- Feature 2: Product Differentiation (AI Dietary Assistant) -->
         <section class="ai-section">
             <h3>✨ AI Dietary Assistant</h3>
-            <p style="font-size: 14px; color: var(--text-muted);">Tell me your cravings, diet, or macros.</p>
+            <p style="font-size: 14px; color: var(--text-muted);">Ask anything! (e.g., "What's the cheapest?", "Do you have veg?", "I want spicy")</p>
             <div class="ai-input-group">
-                <input type="text" id="aiInput" placeholder="e.g., High protein post-workout meal">
+                <input type="text" id="aiInput" placeholder="Ask about our 5 menu items...">
                 <button onclick="askAI()">Ask AI</button>
             </div>
             <div id="ai-response"></div>
@@ -190,7 +190,7 @@
                     <button class="add-btn" onclick="addToCart('Double Smash Burger', 349)">+ Add</button>
                 </div>
                 
-                <!-- Food Item 2 (UPDATED FRIES IMAGE) -->
+                <!-- Food Item 2 -->
                 <div class="menu-item">
                     <img src="https://images.unsplash.com/photo-1585109649139-366815a0d713?auto=format&fit=crop&w=200&q=80" alt="Fries" class="food-img">
                     <div class="food-details">
@@ -300,33 +300,75 @@
             updateCartUI();
         }
 
-        // 2. AI Assistant Logic
+        // 2. Comprehensive AI Assistant Logic
         function askAI() {
             const input = document.getElementById('aiInput').value.toLowerCase();
             const responseDiv = document.getElementById('ai-response');
             
             if(!input) {
-                responseDiv.innerHTML = "Please enter a craving first!";
+                responseDiv.innerHTML = "Please ask a question about our menu!";
                 responseDiv.style.display = "block";
                 return;
             }
 
-            responseDiv.innerHTML = "<em>Analyzing your nutritional goals...</em>";
+            responseDiv.innerHTML = "<em>Analyzing our menu for you...</em>";
             responseDiv.style.display = "block";
 
             setTimeout(() => {
-                let recommendation = "";
-                if(input.includes("protein") || input.includes("workout") || input.includes("healthy")) {
-                    recommendation = "AI Suggestion: You should try the <strong>Keto Power Salad</strong> from Green Bowl Co. It has 45g of protein and fits your macros perfectly!";
-                } else if(input.includes("burger") || input.includes("cheat")) {
-                    recommendation = "AI Suggestion: Treating yourself? The <strong>Double Smash Burger</strong> is highly rated for cheat days.";
-                } else if(input.includes("indian") || input.includes("curry") || input.includes("spicy")) {
-                    recommendation = "AI Suggestion: Craving comfort? The <strong>Butter Chicken Bowl</strong> from Spice Route is a local favorite.";
-                } else {
-                    recommendation = "AI Suggestion: Based on your input, our exclusive partner The Burger Club has options you might love.";
+                let rec = "";
+                
+                // --- CATEGORY 1: Pricing Queries ---
+                if (input.includes("cheap") || input.includes("lowest") || input.includes("under 200")) {
+                    rec = "Our cheapest item is the <strong>Truffle Parmesan Fries</strong> at just ₹199! Great for a quick snack.";
+                } 
+                else if (input.includes("expensive") || input.includes("highest") || input.includes("most")) {
+                    rec = "Our most premium dish is the <strong>Butter Chicken Bowl</strong> at ₹399. It's rich, authentic, and completely worth it!";
+                } 
+                else if (input.includes("price") || input.includes("cost") || input.includes("how much") || input.includes("menu")) {
+                    rec = "Here are our prices: Fries (₹199), Avocado Toast (₹249), Keto Salad (₹299), Smash Burger (₹349), and Butter Chicken (₹399).";
                 }
-                responseDiv.innerHTML = recommendation;
-            }, 800);
+                else if (input.includes("burger price") || input.includes("cost of burger")) {
+                    rec = "The Double Smash Burger costs ₹349.";
+                }
+                
+                // --- CATEGORY 2: Dietary & Health Queries ---
+                else if (input.includes("veg ") || input.includes("vegetarian")) {
+                    rec = "We have great vegetarian options! You will love the <strong>Keto Power Salad (₹299)</strong>, <strong>Avocado Toast (₹249)</strong>, or our <strong>Truffle Fries (₹199)</strong>.";
+                } 
+                else if (input.includes("vegan") || input.includes("light") || input.includes("breakfast")) {
+                    rec = "I recommend the <strong>Avocado Toast</strong> (₹249). It's light, fresh, plant-based, and perfect for a healthy start.";
+                } 
+                else if (input.includes("protein") || input.includes("workout") || input.includes("keto") || input.includes("diet") || input.includes("healthy")) {
+                    rec = "The <strong>Keto Power Salad</strong> (₹299) is packed with protein and low in carbs. Perfect for hitting your daily macros!";
+                }
+                
+                // --- CATEGORY 3: Specific Item Queries & Cravings ---
+                else if (input.includes("chicken") || input.includes("indian") || input.includes("curry") || input.includes("spicy") || input.includes("comfort")) {
+                    rec = "You are looking for the <strong>Butter Chicken Bowl</strong> (₹399) from Spice Route. It's rich, spicy, and the ultimate comfort food.";
+                } 
+                else if (input.includes("burger") || input.includes("cheat") || input.includes("heavy") || input.includes("fast food") || input.includes("beef") || input.includes("meat")) {
+                    rec = "Treat yourself to the <strong>Double Smash Burger</strong> (₹349) from The Burger Club! Pair it with fries for the ultimate cheat meal.";
+                } 
+                else if (input.includes("fries") || input.includes("snack") || input.includes("potato") || input.includes("side")) {
+                    rec = "Our <strong>Truffle Parmesan Fries</strong> (₹199) are crispy, flavorful, and make the perfect side or quick snack.";
+                } 
+                else if (input.includes("non veg") || input.includes("non-veg")) {
+                    rec = "For non-veg, we highly recommend the <strong>Butter Chicken Bowl (₹399)</strong> or the <strong>Double Smash Burger (₹349)</strong>.";
+                } 
+                else if (input.includes("toast") || input.includes("avocado")) {
+                    rec = "The <strong>Avocado Toast (₹249)</strong> is served fresh from Green Bowl Co. It's a great light option!";
+                } 
+                else if (input.includes("salad")) {
+                    rec = "The <strong>Keto Power Salad (₹299)</strong> is our signature healthy bowl, keeping you fit without compromising on taste.";
+                }
+                
+                // --- CATEGORY 4: Fallback for unmapped queries ---
+                else {
+                    rec = "I can help you decide between our 5 items: Burger, Fries, Keto Salad, Avocado Toast, or Butter Chicken. Try asking 'What is cheapest?', 'Do you have veg?', or 'I want spicy food'.";
+                }
+                
+                responseDiv.innerHTML = "✨ <strong>AI Suggestion:</strong> " + rec;
+            }, 600);
         }
 
         // 3. Cart Logic
